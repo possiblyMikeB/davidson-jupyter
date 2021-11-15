@@ -1,2 +1,2 @@
 # Davidson Juypter Runtime
-This is a collection of `jupyter-server-proxy` packages as well as small one-off modifications of other packages which did not merit a pull request.
+This is a collection of packages, modules, and depencencies which provide a baseline Jupyter runtime environment used by the Main JupyterHub service at Davidson College.
