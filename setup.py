@@ -18,7 +18,14 @@ setup(
             'theia = davidson_jupyter:setup_theia'
         ]
     },
-    install_requires=['jupyter-server-proxy>=1.2.0'],
+    install_requires=[
+        'jupyterhub==1.4.2',
+        'jupyterlab==3.2',
+        'jupyterlab-git==0.32',
+        'jupyter-server-proxy>=1.2.0',
+        'nbgitpuller',
+        'jupyterlab-system-monitor @ git+https://www.github.com/possiblyMikeB/jupyterlab-system-monitor.git'
+    ],
     include_package_data=True,
     zip_safe=False
 )
