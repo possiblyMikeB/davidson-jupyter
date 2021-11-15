@@ -1,0 +1,8 @@
+{
+    "argv": ["/bin/bash", "-c",
+                "source /opt/conda/bin/activate octave && python -m octave_kernel -f {connection_file}"],
+    "display_name": "Octave",
+    "mimetype": "text/x-octave",
+    "language": "octave",
+    "name": "octave"
+}
