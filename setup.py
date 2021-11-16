@@ -52,13 +52,14 @@ setup(
         ]),
         ('share/jupyterhub/templates', [
             'share/jupyterhub/templates/duo.html',
-            'share/jupyterhub/static/components/duo/css',
+        ]),
+        ('share/jupyterhub/static/ccomponents/duo/css', [
             'share/jupyterhub/static/components/duo/css/Duo-Frame.css',
-            'share/jupyterhub/static/components/duo/js',
+        ]),
+        ('share/jupyterhub/static/components/duo/js', [
             'share/jupyterhub/static/components/duo/js/Duo-Web-v2.js',
             'share/jupyterhub/static/components/duo/js/Duo-Web-v2.min.js'
         ])
-
     ],
     entry_points={
         'jupyter_serverproxy_servers': [
@@ -74,13 +75,13 @@ setup(
 
         # hub
         'jupyterhub==1.4.2',
-        'batchspawner @ git+https://github.com/jupyterhub/batchspawner@ab0e00e',
-        'jupyterhub-ldapauthenticator @ git+https://github.com/jupyterhub/ldapauthenticator@24f11eb',
+        'batchspawner @ git+https://github.com/jupyterhub/batchspawner.git@ab0e00e',
+        'jupyterhub-ldapauthenticator @ git+https://github.com/jupyterhub/ldapauthenticator.git@24f11eb',
         #'jupyterhub-duoauthenticator @ git+https://github.com/possiblyMikeB/jupyter-duoauthenticator.git@a617827',
-        'jupyterhub-traefik-proxy @ git+https://github.com/possiblyMikeB/traefik-proxy@traefik-v2',
+        'jupyterhub-traefik-proxy @ git+https://github.com/possiblyMikeB/traefik-proxy.git@traefik-v2',
         
-        'jupyterhub-idle-culler @ git+https://github.com/jupyterhub/jupyterhub-idle-culler@80c8c17',
-        'jupyterhub-announcement @ git+https://github.com/rcthomas/jupyterhub-announcement.git@1504bf2'
+        'jupyterhub-idle-culler @ git+https://github.com/jupyterhub/jupyterhub-idle-culler.git@80c8c17',
+        #'jupyterhub-announcement @ git+https://github.com/rcthomas/jupyterhub-announcement.git',
         
         # runtime
         'jupyter-archive>=3.2.0',
