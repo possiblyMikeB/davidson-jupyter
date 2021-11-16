@@ -76,9 +76,9 @@ setup(
         'jupyterhub==1.4.2',
         'batchspawner @ git+https://github.com/jupyterhub/batchspawner@ab0e00e',
         'jupyterhub-ldapauthenticator @ git+https://github.com/jupyterhub/ldapauthenticator@24f11eb',
-        
         #'jupyterhub-duoauthenticator @ git+https://github.com/possiblyMikeB/jupyter-duoauthenticator.git@a617827',
         'jupyterhub-traefik-proxy @ git+https://github.com/possiblyMikeB/traefik-proxy@traefik-v2',
+        
         'jupyterhub-idle-culler @ git+https://github.com/jupyterhub/jupyterhub-idle-culler@80c8c17',
         'jupyterhub-announcement @ git+https://github.com/rcthomas/jupyterhub-announcement.git@1504bf2'
         
