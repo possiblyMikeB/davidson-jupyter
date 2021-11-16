@@ -1,5 +1,5 @@
 
-from setuptools import setup, find_namespace_packages, findall
+from setuptools import setup, find_packages, findall
 
 package_data = \
     findall(dir='./davidson/runtime/share')+\
@@ -8,9 +8,13 @@ package_data = \
 setup(
     name="jupyter-davidson",
     version='0.3.1',
-    packages=find_namespace_packages(
-        include=['davidson.*']
-    ),
+    packages=[
+        'davidson.hub',
+        'davidson.hub.api',
+        'davidson.hub.ctl',
+        'davidson.hub.ctl.tests',
+        'davidson.runtime'
+    ],
     package_data={
         'davidson.runtime':
            [ obj.replace('/davidson/runtime','') for obj in package_data ],
@@ -23,7 +27,28 @@ setup(
             'config/jupyter_notebook_config.py'
         ]),
         ('etc/jupyterhub/conf.d', [
-            'config/hub.d/*.py'
+            'config/hub.d/00-common.py',
+            'config/hub.d/00-handler-pages.py',
+            'config/hub.d/01-tls-cluster.py',
+            'config/hub.d/01-tls-internal.py',
+            'config/hub.d/01-tls-watson.py',
+            'config/hub.d/02-service-announcements.py',
+            'config/hub.d/02-service-common.py',
+            'config/hub.d/02-service-cull-idle.py',
+            'config/hub.d/03-proxy-chp-image.py',
+            'config/hub.d/03-proxy-chp-managed.py',
+            'config/hub.d/03-proxy-common.py',
+            'config/hub.d/03-proxy-traefik-etcd.py',
+            'config/hub.d/04-spawner-common.py',
+            'config/hub.d/04-spawner-csystemd.py',
+            'config/hub.d/04-spawner-dummy.py',
+            'config/hub.d/04-spawner-local.py',
+            'config/hub.d/04-spawner-slurm.py',
+            'config/hub.d/05-auth-common.py',
+            'config/hub.d/05-auth-duo.py',
+            'config/hub.d/05-auth-ldap.py',
+            'config/hub.d/05-auth-lti.py',
+            'config/hub.d/05-auth-pam.py'
         ]),
         ('share/jupyterhub/templates', [
             'share/jupyterhub/templates/duo.html',
@@ -37,16 +62,16 @@ setup(
     ],
     entry_points={
         'jupyter_serverproxy_servers': [
-            'desktop = davidson_jupyter:setup_desktop',
-            'rstudio = davidson_jupyter:setup_rserver',
-            'theia = davidson_jupyter:setup_theia'
+            'desktop = davidson.runtime:setup_desktop',
+            'rstudio = davidson.runtime:setup_rserver',
+            'theia = davidson.runtime:setup_theia'
         ]
     },
     install_requires=[
         # build requirement
         'setuptools_rust',
         'duo_web',
-        
+
         # hub
         'jupyterhub==1.4.2',
         'batchspawner @ git+https://github.com/jupyterhub/batchspawner@ab0e00e',
