@@ -49,16 +49,6 @@ setup(
             'config/hub.d/05-auth-ldap.py',
             'config/hub.d/05-auth-lti.py',
             'config/hub.d/05-auth-pam.py'
-        ]),
-        ('share/jupyterhub/templates', [
-            'share/jupyterhub/templates/duo.html',
-        ]),
-        ('share/jupyterhub/static/ccomponents/duo/css', [
-            'share/jupyterhub/static/components/duo/css/Duo-Frame.css',
-        ]),
-        ('share/jupyterhub/static/components/duo/js', [
-            'share/jupyterhub/static/components/duo/js/Duo-Web-v2.js',
-            'share/jupyterhub/static/components/duo/js/Duo-Web-v2.min.js'
         ])
     ],
     entry_points={
@@ -75,19 +65,12 @@ setup(
 
         # hub
         'jupyterhub==1.4.2',
-        'batchspawner @ git+https://github.com/jupyterhub/batchspawner.git@ab0e00e',
-        'jupyterhub-ldapauthenticator @ git+https://github.com/jupyterhub/ldapauthenticator.git@24f11eb',
-        #'jupyterhub-duoauthenticator @ git+https://github.com/possiblyMikeB/jupyter-duoauthenticator.git@a617827',
-        'jupyterhub-traefik-proxy @ git+https://github.com/possiblyMikeB/traefik-proxy.git@traefik-v2',
-        
-        'jupyterhub-idle-culler @ git+https://github.com/jupyterhub/jupyterhub-idle-culler.git@80c8c17',
-        #'jupyterhub-announcement @ git+https://github.com/rcthomas/jupyterhub-announcement.git',
-        
+
         # runtime
         'jupyter-archive>=3.2.0',
         'jupyter-server-proxy>=1.2.0',
         'jupyterlab==3.2',
-        'jupyterlab-git>=0.34 ',
+        'jupyterlab-git>=0.34',
         'jupyter-resource-usage @ git+https://www.github.com/possiblyMikeB/nbresuse.git@davidson',
         'jupyterlab-system-monitor @ git+https://www.github.com/possiblyMikeB/jupyterlab-system-monitor.git',
         'jupyterlab_widgets',
