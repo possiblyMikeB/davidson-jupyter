@@ -75,7 +75,12 @@ setup(
         'jupyterlab-system-monitor @ git+https://www.github.com/possiblyMikeB/jupyterlab-system-monitor.git',
         'jupyterlab_widgets',
         'nbgitpuller',
-        'ipympl>=0.8.2'
+        'ipympl>=0.8.2',
+        'numpy>=1.19.5',
+        'scipy>=1.7.3',
+        'sympy>=1.9',
+        'pandas>=1.3.5',
+        'scikit-learn>=1.0.2'
     ],
     include_package_data=True,
     zip_safe=False
