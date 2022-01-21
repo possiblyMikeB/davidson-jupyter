@@ -23,5 +23,8 @@ def setup_theia():
             'USE_LOCAL_GIT': 'true'
         },
         'timeout': 15,
-        'launcher_entry': False
+        'launcher_entry': {
+            'enabled': False,
+            'title': 'Theia'
+        }
     }
