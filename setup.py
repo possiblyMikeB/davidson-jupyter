@@ -21,6 +21,26 @@ setup(
         'davidson.hub': []
     },
     data_files=[
+        ('share/jupyter/kernels/python3', [
+            'kernels/bundle/python-3.8/kernel.json',
+            'kernels/bundle/python-3.8/logo-32x32.png',
+            'kernels/bundle/python-3.8/logo-64x64.png'
+        ]),
+        ('share/jupyter/kernels/octave', [
+            'kernels/bundle/octave/kernel.json',
+            'kernels/bundle/octave/logo-32x32.png',
+            'kernels/bundle/octave/logo-64x64.png'
+        ]),
+        ('share/jupyter/kernels/ir', [
+            'kernels/bundle/ir/kernel.json',
+            'kernels/bundle/ir/kernel.js',
+            'kernels/bundle/ir/logo-64x64.png'
+        ]),
+        ('share/jupyter/kernels/python2', [
+            'kernels/bundle/python-2.7/kernel.json',
+            'kernels/bundle/python-2.7/logo-32x32.png',
+            'kernels/bundle/python-2.7/logo-64x64.png'
+        ]),
         ('etc/jupyter', [
             'config/jupyter_lab_config.py',
             'config/jupyter_server_config.py',
@@ -76,11 +96,16 @@ setup(
         'jupyterlab_widgets',
         'nbgitpuller',
         'ipympl>=0.8.2',
+        'ipywidgets>=7.6.5',
         'numpy>=1.19.5',
         'scipy>=1.7.3',
         'sympy>=1.9',
         'pandas>=1.3.5',
-        'scikit-learn>=1.0.2'
+        'scikit-learn>=1.0.2',
+        'scitools3>=1.0',
+
+        # additional kernels
+        'calysto_bash>=0.2.2'
     ],
     include_package_data=True,
     zip_safe=False
