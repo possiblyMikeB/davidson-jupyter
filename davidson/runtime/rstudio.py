@@ -79,7 +79,8 @@ def setup_rserver():
         'launcher_entry': {
             'title': 'RStudio',
             'icon_path': get_icon_path()
-        }
+        },
+        'timeout': 10
     }
     if os.environ.get('RSESSION_PROXY_RSTUDIO_1_4', False):
         server_process['launcher_entry']['path_info'] = 'rstudio/auth-sign-in?appUrl=%2F'
@@ -122,5 +123,6 @@ def setup_rsession():
         'launcher_entry': {
             'title': 'RStudio',
             'icon_path': get_icon_path()
-        }
+        },
+        'timeout': 10
     }
