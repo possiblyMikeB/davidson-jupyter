@@ -8,6 +8,7 @@ package_data = \
 setup(
     name="jupyter-davidson",
     version='0.3.1',
+    python_requires='>=3.8',
     packages=[
         'davidson.hub',
         'davidson.hub.api',
