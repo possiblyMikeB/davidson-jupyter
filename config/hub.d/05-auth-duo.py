@@ -10,7 +10,7 @@ c.DuoAuthenticator.ikey = os.environ.get('DUO_IKEY')
 c.DuoAuthenticator.skey = os.environ.get('DUO_SKEY')
 c.DuoAuthenticator.akey = os.environ.get('DUO_AKEY')
 c.DuoAuthenticator.apihost = os.environ.get('DUO_API_HOST')
-c.DuoAuthenticator.primary_auth_class = type('EncodeAuthenticator', (object, c.JupyterHub.authenticator_class, EncodeAuthenticatorShim), {})
+c.DuoAuthenticator.primary_auth_class = type('EncodeAuthenticator', (EncodeAuthenticatorShim, c.JupyterHub.authenticator_class, object,), {})
 
 # set authenticator class
 c.JupyterHub.authenticator_class = DuoAuthenticator
