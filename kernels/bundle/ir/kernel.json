@@ -1,6 +1,6 @@
 {
     "argv": ["/bin/bash", "-c",
-                "source /opt/conda/bin/activate r-36 && R --slave -e 'IRkernel::main()' --args '{connection_file}'"],
+                "source /opt/conda/bin/activate r-40 && R --slave -e 'IRkernel::main()' --args '{connection_file}'"],
     "display_name": "R",
     "language": "R",
     "name": "R"
