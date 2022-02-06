@@ -1,0 +1,135 @@
+#!/bin/bash -l
+#SBATCH --mail-type=FAIL
+#SBATCH --mail-user=sysadmins@davidson.edu
+#SBATCH --open-mode=append
+#SBATCH --output={{homedir}}/.jupyter.batch.log
+#SBATCH --nodes 1
+#SBATCH --chdir={{homedir}}{% if workspace %}/{{workspace}}{% endif %}
+#SBATCH --export={{keepvars}}
+#SBATCH --get-user-env=L
+{%            if account     %}#SBATCH --account={{account}}
+{% endif %}{% if cluster     %}#SBATCH --cluster={{cluster}}
+{% endif %}{% if partition   %}#SBATCH --partition={{partition}}
+{% endif %}{% if qos         %}#SBATCH --qos={{qos}}
+{% endif %}{% if ntasks      %}#SBATCH --ntasks={{ntasks}}
+{% endif %}{% if runtime     %}#SBATCH --time={{runtime}}
+{% endif %}{% if gres        %}#SBATCH --gres={{gres}}
+{% endif %}{% if memory      %}#SBATCH --mem={{memory}}
+{% endif %}{% if nprocs      %}#SBATCH --cpus-per-task={{nprocs}}
+{% endif %}{% if reservation %}#SBATCH --reservation={{reservation}}
+{% endif %}{% if options     %}#SBATCH {{options}}{% endif %}
+
+## setup environment variables
+export PROFILE_NAME="{{profile}}"
+export PROFILE_CONDA="{{conda_path}}"
+export PROFILE_ENV="{{conda_env}}"
+
+# load slurm environment
+module load slurm
+
+## set job-name to something descriptive
+if [[ "$JUPYTERHUB_API_URL" =~ ^http[s]?://jupyter.davidson.edu ]]; then
+    name="Jupyter"
+else
+    name="$PROFILE_NAME:Jupyter"
+fi
+
+# make it official
+scontrol update jobid="$SLURM_JOB_ID" name="$name"
+
+## attach callback for SIGTERM
+trap 'echo SIGTERM received' TERM
+
+## general path info
+export HUB_PATH="$HOME/.config/hub"
+export HUB_ROOT="$HOME{% if workspace %}/{{workspace}}{% endif %}"
+export HUB_SESSIONID=$(echo -n "$JUPYTERHUB_SERVER_NAME" | md5sum | cut -d' ' -f1)
+export HUB_PRIVATE="$HUB_PATH/$PROFILE_NAME/$HUB_SESSIONID"
+
+# make sure required directories exist & with appropriate perms
+mkdir -p "$HUB_PRIVATE" && chmod 0700 "$HUB_PRIVATE"
+mkdir -p "$HUB_ROOT" && chmod 0700 "$HUB_ROOT"
+
+# essential files 
+export HUB_CLEANUP="$HUB_PRIVATE/cleanup" && touch $HUB_CLEANUP
+export HUB_LOG="$HUB_PRIVATE/session.log"
+
+## resource info
+export MEM_LIMIT=$((1024 * 1024 * $SLURM_MEM_PER_NODE))
+
+## handle any gpu allocations
+if [ "{{partition}}" == "gpus" ]; then
+    export TF_FORCE_GPU_ALLOW_GROWTH=true
+    if [[ "$CUDA_VISIBLE_DEVICES" =~ ^[0-9]+$ ]]; then
+        # set visible cuda devices (dirty but it works.. for the time being)
+        export CUDA_VISIBLE_DEVICES=$((CUDA_VISIBLE_DEVICES % 6))
+    fi  
+fi
+
+## runtime info 
+#  (the filename length of a UNIX socket
+#     has a hard-limit, so we move things closer to /)
+export JUPYTER_RUNTIME_DIR=$(mktemp -d /tmp/run-XXXXXXX)
+
+# mark temporary runtime directory to be cleaned up 
+#  when the server shuts down
+echo "$JUPYTER_RUNTIME_DIR" | tee -a "$HUB_CLEANUP"
+
+## setup slurm environment 
+export SLURM_EXPORT_ENV="PROFILE_CONDA,PROFILE_ENV,PATH,PROFILE_NAME,$SLURM_EXPORT_ENV"
+export SLURM_EXPORT_ENV="HUB_CLEANUP,HUB_PATH,HUB_SESSIONID,HUB_RUNNER,$SLURM_EXPORT_ENV"
+export SLURM_EXPORT_ENV="JUPYTER_RUNTIME_DIR,HUB_PRIVATE,HUB_LOG,$SLURM_EXPORT_ENV"
+export SLURM_EXPORT_ENV="HUB_ROOT,MEM_LIMIT,$SLURM_EXPORT_ENV"
+export SLURM_EXPORT_ENV="CUDA_VISIBLE_DEVICES,TF_FORCE_GPU_ALLOW_GROWTH,$SLURM_EXPORT_ENV"
+
+## make sure VNC logs are placed in the appropriate place &
+# any existing vnc config is nuked
+rm -rf "$HOME/.vnc" && \
+    ln -sf "$HUB_PRIVATE" "$HOME/.vnc"
+
+## rotate session logs
+for ii in 3 2 1; do
+    jj=$((ii+1));
+    if [ -f "$HUB_LOG.$ii" ]; then
+        mv -f "$HUB_LOG.$ii" "$HUB_LOG.$jj";
+    fi
+done
+if [ -f "$HUB_LOG" ]; then
+    mv -f "$HUB_LOG" "$HUB_LOG.1"
+fi
+
+## setup scratch directory (if one exists on this node)
+if [ -d "/scratch" ]; then
+    USERN=$(echo $USER| sed -e's/@.*//')
+    HUB_SCRATCH="/scratch/$USERN"
+
+    # try and set up directory appropriately    
+    mkdir -p "$HUB_SCRATCH"
+    chmod og+rx "$HUB_SCRATCH"
+
+    # if there is a directory named `public`
+    #   on the first level of the scratch directory, then
+    #   were going to assume it's meant to be `public.`
+    #     ... and modify the permissions.
+    if [ -d "$HUB_SCRATCH/public" ]; then
+        # make everything readable
+        chmod -R og+r "$HUB_SRATCH/public";
+        # and directories transversable
+        chmod og+x $(find $HUB_SCRATCH/public -tpye d)
+    fi
+    export SLURM_EXPORT_ENV="HUB_SCRATCH,$SLURM_EXPORT_ENV"
+fi
+
+## actiave enviornment and begin job-step
+source "$PROFILE_CONDA/bin/activate" "$PROFILE_ENV"
+
+HUB_RUNNER=$(which jupyterhub-runner)
+module load texlive
+module load theia
+
+{{prologue}}
+{{srun}} "$HUB_RUNNER" {{cmd}} > "$HUB_LOG" 2>&1
+{{epilogue}}
+
+# if signal `trap` worked, then
+echo "$SLURM_JOB_ID: jupyter instance ended gracefully"
