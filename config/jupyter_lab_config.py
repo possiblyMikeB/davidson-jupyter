@@ -1,5 +1,5 @@
 import os
 
 ## turn on collaborative editing
-c.LabApp.collaborative = True
+c.LabApp.collaborative = False
 
