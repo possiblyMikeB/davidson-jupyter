@@ -1,3 +1,8 @@
+# 0.3.1 
+- Move JupyterHub site classes into package `davidson.hub` and reference `davidson.hub` from JupyterHub drop-in files.
+- Add default pack of kernel definitions (these assume the existence of site-specific conda environments)
+- Add site JupyterHub drop-in configuration files (`config/hub.d`)
+- Add preliminary rough-out of JupyterHub dynamic configuration provider (located in package `davidson.hub.ctl`)
 
 # 0.2.1
 
