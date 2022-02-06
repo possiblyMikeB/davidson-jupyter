@@ -6,20 +6,20 @@ import subprocess
 import tempfile
 from textwrap import dedent
 
+HERE = os.path.dirname(os.path.abspath(__file__))
+
 def get_rstudio_executable(prog):
     # Find prog in known locations
     other_paths = [
-        # When rstudio-server deb is installed
-        os.path.join('/usr/lib/rstudio-server/bin', prog),
-        # When just rstudio deb is installed
-        os.path.join('/usr/lib/rstudio/bin', prog),
+        # location of local wrappers
+        os.path.join(f'{HERE}/share/rstudio/bin', prog),
     ]
-    if shutil.which(prog):
-        return prog
-
     for op in other_paths:
         if os.path.exists(op):
             return op
+
+    if shutil.which(prog):
+        return prog
 
     raise FileNotFoundError(f'Could not find {prog} in PATH')
 
