@@ -7,6 +7,8 @@ from traitlets import Any, default, Unicode
 # pull in site proxy implementation
 from davidson.hub.proxy import SiteTraefikProxy
 
+c.SiteTraefikProxy.hub_id = hub_id
+c.SiteTraefikProxy.hub_hostname = hub_hostname
 c.SiteTraefikProxy.should_start = True
 
 # configure traefik using etcd backend

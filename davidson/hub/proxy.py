@@ -6,13 +6,16 @@ from traitlets import Any, default, Unicode
 
 # Site Traefik Proxy interface
 class SiteTraefikProxy(TraefikEtcdProxy):
+    hub_id = Unicode()
+    hub_hostname = Unicode()
+    
     @default("kv_traefik_prefix")
     def _default_kv_traefik_prefix(self):
         return "/traefik"
 
     @default("kv_jupyterhub_prefix")
     def _default_kv_jupyterhub_prefix(self):
-        return f"/jupyterhub/{hub_id}/proxy/routes"
+        return f"/jupyterhub/{self.hub_id}/proxy/routes"
 
     
     async def start(self):
@@ -36,7 +39,7 @@ class SiteTraefikProxy(TraefikEtcdProxy):
             f'{serve_prefix}/loadbalancer/servers/0/url': self.app.hub_bind_url,
             f'{route_prefix}/entrypoints/0': 'trusted',
             f'{route_prefix}/service': desig,
-            f'{route_prefix}/rule': f'Host(`{hub_hostname}`) && PathPrefix(`/hub/api`)',
+            f'{route_prefix}/rule': f'Host(`{self.hub_hostname}`) && PathPrefix(`/hub/api`)',
             f'{route_prefix}/tls': ''
         }
         
@@ -66,7 +69,7 @@ class SiteTraefikProxy(TraefikEtcdProxy):
             
             entries = {
                 # add serversTransports entry 
-                f'{trans_prefix}/servername': hub_hostname,
+                f'{trans_prefix}/servername': self.hub_hostname,
                 f'{trans_prefix}/rootcas/0': ca,
                 f'{trans_prefix}/certificates/0/certfile': cert,
                 f'{trans_prefix}/certificates/0/keyfile': key,
