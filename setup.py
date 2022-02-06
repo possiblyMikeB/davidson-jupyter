@@ -86,7 +86,7 @@ setup(
         # hub
         'jupyterhub==1.4.2',
         'batchspawner==1.0.1',
-        'ldapauthenticator==1.3.2',
+        'jupyterhub-ldapauthenticator==1.3.2',
         'jupyterhub-traefik-proxy @ git+https://github.com/possiblyMikeB/traefik-proxy.git@traefik-v2-hack',
         'jupyterhub-duoauthenticator @ git+https://github.com/possiblyMikeB/jupyter-duoauthenticator.git#a6178272cc3153296a1fd5eab50bfd0a41658bff',
         'jupyterhub-idle-culler @ git+https://github.com/jupyterhub/jupyterhub-idle-culler.git#80c8c17e4b2aac11dab1c59079e7fc24e8c8ca48',
@@ -104,12 +104,12 @@ setup(
         'ipympl>=0.8.2',
         'ipywidgets>=7.6.5',
         'numpy>=1.19.5',
-        'scipy>=1.7.3',
+        'scipy>=1.5',
         'sympy>=1.9',
-        'pandas>=1.3.5',
-        'scikit-learn>=1.0.2',
+        'pandas>=1.2',
+        'scikit-learn>=0.24',
         'scitools3>=1.0',
-
+        
         # additional kernels
         'calysto_bash>=0.2.2'
     ],
