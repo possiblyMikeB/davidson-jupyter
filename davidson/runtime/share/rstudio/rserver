@@ -1,0 +1,29 @@
+#!/bin/bash -l
+# conda env providing R
+CONDA_ENV=r-40
+
+module load conda
+conda activate ${CONDA_ENV}
+
+mkdir -p "/tmp/$USER-rstudio/"
+openssl rand -out "/tmp/$USER-rstudio/cookie" -hex 32
+tee "/tmp/$USER-rstudio/dbconf" <<EOF
+provider=sqlite
+directory=/tmp/$USER-rstudio/
+EOF
+
+export RETICULATE_PYTHON="$CONDA_PREFIX/bin/python"
+export LD_LIBRARY_PATH="$CONDA_PREFIX/lib/R/lib:$CONDA_PREFIX/lib:$LD_LIBRARY_PATH"
+
+module load rstudio-server
+exec rserver \
+    --auth-none=1 \
+    --auth-validate-users=0 \
+    --www-address=127.0.0.1 \
+    --www-root-path="/user/${USER%%@davidson.edu}/rstudio/" \
+    --database-config-file="/tmp/$USER-rstudio/dbconf" \
+    --server-daemonize=0 \
+    --server-user=$USER \
+    --server-data-dir=/tmp/$USER-rstudio \
+    --secure-cookie-key-file=/tmp/$USER-rstudio/cookie \
+    --rsession-path=/opt/pub/profile/defaults/rsession $@
