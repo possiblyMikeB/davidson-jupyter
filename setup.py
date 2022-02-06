@@ -73,6 +73,11 @@ setup(
         ])
     ],
     entry_points={
+        # install site jupyterhub-singleuser wrapper
+        'console_scripts': [
+            'jupyterhub-runner = davidson.runtime.singleuser:main'
+        ],
+        # server-proxy definitions 
         'jupyter_serverproxy_servers': [
             'desktop = davidson.runtime:setup_desktop',
             'rstudio = davidson.runtime:setup_rserver',
