@@ -79,17 +79,23 @@ setup(
         ]
     },
     install_requires=[
-        # build requirement
+        # build requirements
         'setuptools_rust',
         'duo_web',
 
         # hub
         'jupyterhub==1.4.2',
-
+        'batchspawner==1.0.1',
+        'ldapauthenticator==1.3.2',
+        'jupyterhub-traefik-proxy @ git+https://github.com/possiblyMikeB/traefik-proxy.git@traefik-v2-hack',
+        'jupyterhub-duoauthenticator @ git+https://github.com/possiblyMikeB/jupyter-duoauthenticator.git#a6178272cc3153296a1fd5eab50bfd0a41658bff',
+        'jupyterhub-idle-culler @ git+https://github.com/jupyterhub/jupyterhub-idle-culler.git#80c8c17e4b2aac11dab1c59079e7fc24e8c8ca48',
+        'jupyterhub-announcement @ git+https://github.com/rcthomas/jupyterhub-announcement.git#1504bf2ff1f91a1524511c79f1bf44247aa226ca',
+        
         # runtime
+        'jupyterlab==3.2',
         'jupyter-archive>=3.2.0',
         'jupyter-server-proxy>=1.2.0',
-        'jupyterlab==3.2',
         'jupyterlab-git>=0.34',
         'jupyter-resource-usage @ git+https://www.github.com/possiblyMikeB/nbresuse.git@davidson',
         'jupyterlab-system-monitor @ git+https://www.github.com/possiblyMikeB/jupyterlab-system-monitor.git',
