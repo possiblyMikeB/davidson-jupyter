@@ -70,6 +70,10 @@ setup(
             'config/hub.d/05-auth-ldap.py',
             'config/hub.d/05-auth-lti.py',
             'config/hub.d/05-auth-pam.py'
+        ]),
+        ('etc/jupyterhub', [
+            'config/jupyterhub_config.py',
+            'config/batch-script.sh.j2'
         ])
     ],
     entry_points={
