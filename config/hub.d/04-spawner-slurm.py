@@ -1,9 +1,10 @@
-from batchspawner import SlurmSpawner
-import os, sys, pwd, socket
+
+import os, sys, pwd, socket, shutil, asyncio
 from traitlets import (
     Integer, Unicode, Float, Dict, default 
 )
 
+from batchspawner import SlurmSpawner
 from async_generator import async_generator, yield_, yield_from_
 
 class SiteSlurmSpawner(SlurmSpawner):
@@ -27,7 +28,10 @@ class SiteSlurmSpawner(SlurmSpawner):
         help="Job script expects this conda environment"
     ).tag(config=True)
 
-    req_workspace = Unicode().tag(config=True)
+    req_workspace = Unicode(
+        help="Specifies path to superficially isolate jupyter instance to"
+    ).tag(config=True)
+    
     @default('req_workspace')
     def _req_workspace_default(self):
         # XXX: this allows for terminals to open in 
@@ -64,6 +68,7 @@ class SiteSlurmSpawner(SlurmSpawner):
     def state_tres(self):
         return self.req_gres
 
+    ## SPAWNING: Progress
     @async_generator
     async def progress(self):
         """generate messages, etc... describing spawn progress"""
@@ -86,11 +91,11 @@ class SiteSlurmSpawner(SlurmSpawner):
                 })
             await gen.sleep(1)
     
-    def pre_spawn_hook(self, spawner):
-        import shutil
-        self.log.debug("Pre Batch-Job Bootstraping..")
+    ## PRE-SPAWN Hook
+    async def pre_spawn_hook(self, spawner):
+        # ensure home directory is created properly
+        self.log.info("Pre-Spawn: Env. Bootstraping..")
 
-        # ensure the home directory is created
         os.system(f'sudo -u {self.req_username} true')
         try:
             # attempt to create user workspace, if defined
@@ -109,9 +114,42 @@ class SiteSlurmSpawner(SlurmSpawner):
 
         except FileExistsError:
             pass
-            
-        pass
+        
+        # ensure SLURM user account associations are in-order
+        self.log.info("Pre-Spawn: Update SLURM User Associations")
 
+        sacctmgr = f"{os.environ.get('SLURM_PATH','')}/bin/sacctmgr"
+        cmd = (
+            sacctmgr,  '-i',  'add', 'user', f'{self.req_username}', 
+            f'account={self.req_account}',
+            f'partition={self.req_partition}',
+            f'cluster={self.req_cluster}'
+        )
+        
+        proc = await asyncio.create_subprocess_exec(*cmd,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE 
+        )
+
+        try:
+            out, e = await proc.communicate()
+        except:
+            proc.kill()
+            raise RuntimeError("sacctmgr failed: killed before return")
+        else:
+            e = e.decode().strip()
+            out = out.decode().strip()
+            retcode = proc.returncode
+            if retcode != 0 and out.find("Nothing new added.") < 0:
+                self.log.error("sacctmgr failed: returned exitcode %s" % retcode)
+                self.log.error(e)
+                raise RuntimeError(e)
+
+        # ensure `self.notebook_dir` is appropriately set
+        self.notebook_dir = '.'
+        return 
+
+    ## mutal-TLS: Create Certs
     async def create_certs(self):
         """Create and set ownership for the certs to be used for internal ssl
 
@@ -149,6 +187,7 @@ class SiteSlurmSpawner(SlurmSpawner):
         }
         return paths
     
+    ## mutal-TLS: Move/Deploy Certs
     async def move_certs(self, paths):
         """Takes cert paths, moves and sets ownership for them
         Arguments:
@@ -200,14 +239,33 @@ class SiteSlurmSpawner(SlurmSpawner):
 
         return {"keyfile": key, "certfile": cert, "cafile": ca}
 
+    ## SPAWNER: Start
     async def start(self):
         self.log.debug(f'START HOOK: user_options: {self.user_options}')
-        # check if there are any user provided options,
-        if hasattr(self, 'user_options'):
-            # if the user isn't an `admin`,
-            if not self.user.admin:
-                # then reset `user_options` to {}
-                self.user_options = dict()
+
+        ## enforce pre-configured values of critical variables, like
+        #
+        #   `profile`, `conda_path`, `conda_env`,`account`, `cluster`, `partition`,
+        #    `qos`, `username`, `workspace`, `srun`, `options`...
+        #
+        # by only allowing `self.user_options` to override one of the following
+        #
+        #   `nprocs`, `memory`, `runtime`, or `gres` 
+        #
+
+        options = dict()
+        for safe_key in [ 'nproc', 'memory', 'runtime', 'gres' ]:
+            if safe_key in self.user_options:
+                options[safe_key] = self.user_options[safe_key]
+
+        # replace user_options with clean version
+        self.user_options = options
+        
+        # and persist cleaned version in database 
+        self.orm_spawner.user_options = options
+        self.db.commit()
+
+        # procced with spawn
         return await super().start()
     pass
 
@@ -250,7 +308,7 @@ c.SiteSlurmSpawner.req_profile = hub_id
 arg_names = [
     'partition', 'account', 'cluster', 'qos', 'reservation',
     'nprocs', 'ntasks', 'memory', 'gres', 
-    'runtime'
+    'runtime', 'workspace'
 ]
 
 for name in arg_names:
@@ -276,7 +334,7 @@ for name in ['epilog', 'prolog' ]:
         c.SiteSlurmSpawner.req_srun += f' --task-{name} {path}'
         pass
 
-c.SiteSlurmSpawner.req_options = '--ntasks=1 ' + os.environ.get('SPAWNER_SLURM_JOB_EXTRA')
+c.SiteSlurmSpawner.req_options = '--ntasks=1 ' + os.environ.get('SPAWNER_SLURM_JOB_EXTRA', '')
 
 ## conda environment parameters
 c.SiteSlurmSpawner.req_conda_env = os.environ.get('SPAWNER_SLURM_CONDA_ENV')
