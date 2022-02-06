@@ -9,23 +9,18 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 HOME = os.environ.get('HOME')
 
 VNC_PATH = f'{HERE}/share/tigervnc'
-
-# pull in Davidson's JupyterHub environment variables 
-HUB_PATH = os.environ.get('HUB_PATH', '')
-HUB_PRIVATE = os.environ.get('HUB_PRIVATE', HOME)
-
 def setup_desktop():
     # make a secure temporary directory for sockets
     # This is only readable, writeable & searchable by our uid
 
     # XXX: the following need to be node-local
-    sockets_dir = tempfile.mkdtemp() 
+    sockets_dir = os.environ.get('JUPYTER_RUNTIME_DIR', tempfile.mkdtemp())
     sockets_path = os.path.join(sockets_dir, 'vnc-socket')
 
     vnc_command = ' '.join((shlex.quote(p) for p in [
         os.path.join(VNC_PATH, 'bin/vncserver'),
         '-verbose',
-        '-xstartup', os.path.join(HUB_PRIVATE, 'xstartup'),
+        '-xstartup', os.path.join(HERE, 'share/xstartup'),
         '-geometry', '1400x1050',
         '-SecurityTypes', 'None',
         '-rfbunixpath', sockets_path,
