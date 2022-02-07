@@ -1,4 +1,3 @@
-
 from setuptools import setup, find_packages, findall
 
 package_data = \
@@ -6,7 +5,7 @@ package_data = \
     findall(dir='./davidson/runtime/icons')
 
 setup(
-    name="jupyter-davidson",
+    name="davidson-jupyter",
     version='0.3.1',
     python_requires='>=3.8',
     packages=[
