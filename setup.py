@@ -11,10 +11,8 @@ setup(
     python_requires='>=3.8',
     packages=[
         'davidson.hub',
-        'davidson.hub.api',
         'davidson.hub.ctl',
-        'davidson.hub.ctl.tests',
-        'davidson.runtime'
+        'davidson.runtime',
     ],
     package_data={
         'davidson.runtime':
@@ -49,7 +47,7 @@ setup(
         ]),
         
         ('etc/jupyterhub/conf.d',
-            findall(dir='config/hub.d')
+            findall(dir='config/conf.d')
         ),
         ('etc/jupyterhub', [
             'config/jupyterhub_config.py',
