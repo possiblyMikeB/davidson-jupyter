@@ -77,7 +77,7 @@ setup(
         'jupyterhub==1.4.2',
 
     ],
-    extra_requires={
+    extras_require={
         'hub': [
             'batchspawner==1.0.1',
             'jupyterhub-ldapauthenticator==1.3.2',
