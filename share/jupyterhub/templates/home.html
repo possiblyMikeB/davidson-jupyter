@@ -1,0 +1,150 @@
+{% extends "page.html" %}
+{% if announcement_home %}
+  {% set announcement = announcement_home %}
+{% endif %}
+
+{% block main %}
+<div class="container">
+  <!-- BEGIN Default Server -->
+  <div class="panel panel-default">
+    <div class="panel-heading"><strong>{{ default_server.req_profile }} Server</strong></div>
+    <div class="panel-body">
+      <ul class="list-inline">
+	    {% if default_server.active %}
+        <!-- Server Interfaces -->
+	    <li id="services" class="btn-group">
+	      <a role="button" class="btn btn-md btn-primary" href="{{ url }}/tree">Notebook</a>
+	      <a role="button" class="btn btn-md btn-primary" href="{{ url }}/lab">Lab</a>
+	      <a role="button" class="btn btn-md btn-primary hidden-xs" href="{{ url }}/rstudio">RStudio</a>
+	      <a role="button" class="btn btn-md btn-primary hidden-xs" href="{{ url }}/desktop">Desktop</a>
+
+	    </li>
+	    {% endif %}        
+        <!-- Server Actions -->
+	    <li class="pull-right btn-group">
+	      {% if default_server.active %} 
+	      <a id="stop" role="button" class="btn btn-md btn-danger">
+            Stop Server
+	      </a>
+	      {% endif %}
+	      <a id="start" role="button" class="btn btn-md btn-primary" href="{{ url }}">
+	        {% if not default_server.active %}Start{% else %}Visit{% endif %} Server
+	      </a>
+	    </li>
+      </ul>
+    </div>
+    {% if default_server.active %}
+    <table class="server-table table table-striped">
+      <thead>
+	    <tr>
+	      <th>Profile</th><th>ID</th><th>CPUs</th> <th>Memory</th> <th>Node</th> <th <th class="hidden-xs">GRES/TRES</th>
+	    </tr>
+      </thead>
+      <tbody>
+	    <tr>
+	      <td>{{ default_server.req_profile }}</td>
+          <td>{{ default_server.job_id }}</td>
+	      <td>{{ default_server.req_nprocs }}</td>
+	      <td>{{ default_server.req_memory }}</td>
+	      <td>{{ default_server.state_gethost() }}</td>
+	      <td class="hidden-xs" >{{ default_server.state_tres() }}</td>
+	    </tr>
+	    <tr><td colspan="6"></td></tr>
+      </tbody>
+    </table>
+    {% endif %}
+  </div>  
+  <!-- END Default Server -->
+  
+  {% if allow_named_servers %}
+  <!-- BEGIN Named Servers -->
+  <div class="panel panel-default">
+    <div class="panel-heading"><strong>Named Server(s)</strong></div>
+    <div class="panel-body">
+      <small>
+	In addition to your default server,
+	you may have {% if named_server_limit_per_user > 0 %}{{ named_server_limit_per_user }} {% endif %} additional named server(s).
+	This allows you to have more than one server with this profile running at the same time.
+      </small>
+    </div>
+    {% set named_spawners = user.all_spawners(include_default=False)|list %}
+    <table class="server-table table table-striped">
+      <thead>
+	    <tr>
+          <th>Name</th>
+          <th>URL</th>
+          <th>Last activity</th>
+          <th>Actions</th>
+	    </tr>
+      </thead>
+      <tbody>
+	    {% for spawner in named_spawners %}
+	    <tr class="home-server-row" data-server-name="{{ spawner.name }}">
+          {# name #}
+          <td>{{ spawner.name }}</td>
+          {# url #}
+          <td>
+            <a class="server-link {% if not spawner.ready %}hidden{% endif %}" href="{{ user.server_url(spawner.name) }}">
+              {{ user.server_url(spawner.name) }}
+            </a>
+          </td>
+          {# activity #}
+          <td class='time-col'>
+            {% if spawner.last_activity %}
+            {{ spawner.last_activity.isoformat() + 'Z' }}
+            {% else %}
+            Never
+            {% endif %}
+          </td>
+          {# actions #}
+          <td>
+            <a role="button" class="stop-server btn btn-xs btn-danger{% if not spawner.active %} hidden{% endif %}" id="stop-{{ spawner.name }}">stop</a>
+            <a role="button" class="start-server btn btn-xs btn-primary {% if spawner.active %} hidden{% endif %}" id="start-{{ spawner.name }}"
+               href="{{ base_url }}spawn/{{ user.name }}/{{ spawner.name }}" >
+              start
+            </a>
+            <a role="button" class="delete-server btn btn-xs btn-danger{% if spawner.active %} hidden{% endif %}" id="delete-{{ spawner.name }}">delete</a>
+          </td>
+	    </tr>
+	    {% endfor %}
+		<tr class="home-server-row add-server-row">
+          <td colspan="4">
+            <input class="new-server-name" placeholder="Name your server">
+            <a role="button" class="new-server-btn" class="add-server btn btn-xs btn-primary">
+              Add New Server
+            </a>
+          </td>
+	    </tr>
+      </tbody>
+    </table>   
+  </div>
+  <!-- END Named Servers -->
+  {% endif %}
+  <!-- BEGIN Jobs -->
+  <div class="panel panel-default">
+    <div class="panel-heading"><strong>My Queue</strong></div>
+    
+    <table class="server-table table table-striped">
+      <thead>
+        <tr>
+          {% for name in user_jobs.pop(0) %}<th>{{ name }}</th>{% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for job in user_jobs %}
+        <tr>{% for val in job %}<td>{{ val }}</td>{% endfor %}</tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <!-- END Jobs -->
+  
+</div>
+{% endblock main %}
+
+{% block script %}
+{{ super() }}
+<script type="text/javascript">
+require(["home"]);
+</script>
+{% endblock %}
