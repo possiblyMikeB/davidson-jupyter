@@ -6,8 +6,11 @@ from traitlets import Any, default, Unicode
 
 # Site Traefik Proxy interface
 class SiteTraefikProxy(TraefikEtcdProxy):
-    hub_id = Unicode()
-    hub_hostname = Unicode()
+
+    ## Naming parameters
+    
+    hub_id = Unicode().tag(config=True)
+    hub_hostname = Unicode().tag(config=True)
     
     @default("kv_traefik_prefix")
     def _default_kv_traefik_prefix(self):
