@@ -86,6 +86,7 @@ setup(
             'duo_web'
         ],
         'runtime': [
+            # jupyter, extensions, & kernels
             'jupyterlab==3.2',
             'jupyter-archive>=3.2.0',
             'jupyter-server-proxy>=1.2.0',
@@ -106,7 +107,8 @@ setup(
             'scikit-learn>=0.24',
             'scitools3>=1.0',
             'beautifulsoup4>=4',
-            'lxml>=4.7'
+            'lxml>=4.7',
+            'pipenv'
         ]
     },
     include_package_data=True,
