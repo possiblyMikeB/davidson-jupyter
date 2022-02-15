@@ -100,10 +100,10 @@ setup(
             'calysto_bash>=0.2.2',
             
             # all, runtime
-            'numpy>=1.19.5',
+            'numpy>=1.19.4',
             'scipy>=1.5',
             'sympy>=1.9',
-            'pandas>=1.2',
+            'pandas>=1.1',
             'scikit-learn>=0.24',
             'scitools3>=1.0',
             'beautifulsoup4>=4',
