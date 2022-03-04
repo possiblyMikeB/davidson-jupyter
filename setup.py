@@ -71,6 +71,7 @@ setup(
     install_requires=[
         # all
         'setuptools_rust',
+        'packaging==20.9',
         'jupyterhub==1.4.2',
 
     ],
