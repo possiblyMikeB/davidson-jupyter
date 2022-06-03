@@ -73,6 +73,7 @@ setup(
         'setuptools_rust',
         'packaging==20.9',
         'jupyterhub==1.4.2',
+        'azure-devops==6.0.0b4'
 
     ],
     extras_require={
