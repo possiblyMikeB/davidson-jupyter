@@ -88,7 +88,7 @@ setup(
         ],
         'runtime': [
             # jupyter, extensions, & kernels
-            'jupyterlab==3.2',
+            'jupyterlab==3.2.8',
             'jupyter-archive>=3.2.0',
             'jupyter-server-proxy>=1.2.0',
             'jupyterlab-git>=0.34',
